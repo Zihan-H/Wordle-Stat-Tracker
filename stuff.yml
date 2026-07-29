@@ -1,0 +1,19 @@
+name: wordle-stat-tracker.py
+on: [push]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: load content
+              uses: actions/checkout@v2
+              
+            - name: load python
+              uses: actions/setup-python@v4
+              with:
+                python-version: '3.14'
+
+            - name: start bot
+              env:
+                TOKEN: ${{ secrets.TOKEN }}
+              run: python wordle-stat-tracker.py
