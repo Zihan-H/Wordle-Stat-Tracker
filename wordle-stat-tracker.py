@@ -185,10 +185,15 @@ async def on_ready():
     await tree.sync()
     print(f'We have logged in as {client.user}')
     for guild in client.guilds:
-        wguild = WGuild(guild.id, guild.name, guild.owner)
-        servers[guild.id] = wguild
+        servers[guild.id] = WGuild(guild.id, guild.name, guild.owner)
         await prep_guild(guild)
     return  
+
+@client.event
+async def on_guild_join(guild):
+    servers[guild.id] = WGuild(guild.id, guild.name, guild.owner)
+    await prep_guild(guild)
+    return
 
 @client.event
 async def on_member_join(member):
