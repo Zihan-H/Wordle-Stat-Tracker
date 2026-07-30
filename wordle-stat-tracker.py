@@ -111,12 +111,6 @@ class Day:
                     self.newsum += newboard[row][0]
                     self.leaderboard[i][list(self.leaderboard[i]).index(0)] = col
         self.par = newsum / self.numPlayers
-            
-        
-# [3 Ernest 0 0 0 0 0 0 0 0 0 0 0 0 ...]
-# [4 Noah Nathan Rory Michael 0 0 0 ...]
-# [5 Zihan 0 0 0 0 0 0 0 0 0 0 0 0  ...]
-# [6 Shaan 0 0 0 0 0 0 0 0 0 0 0 0  ...]
 
 def ripScores(raw, date, wguild):
     server = wguild.server
@@ -145,14 +139,6 @@ def ripScores(raw, date, wguild):
             scores = np.append(scores, [[score] + scorers + [0 for i in range(len(server) - len(scorers))]], axis = 0)
             scorers = []
     return (scores, len(players), total)
-                
-                
-    
-#Your group is on a 415 day streak! 🔥🔥🔥 Here are yesterday's results:
-#👑 3/6: @Ernest
-#4/6: @Noah @Nathan @Rory @Michael
-#5/6: @Zihan
-#6/6: @Shaan
 
 async def prep_guild(guild):
     wguild = servers[guild.id]
@@ -203,6 +189,53 @@ async def on_ready():
         servers[guild.id] = wguild
         await prep_guild(guild)
     return  
+
+@client.event
+async def on_member_join(member):
+    wguild = servers[member.guild.id]
+    if not (member.id in wguild.server):
+        wguild.server[member.id] = Player(member.id, member.nick)
+    elif not (member.nick == wguild.server[member.id].pname):
+        wguild.server[member.id].pname = member.nick
+    return
+
+@client.event
+async def on_member_update(before, after):
+    wguild = servers[after.guild.id]
+    if not (before.nick == after.nick):
+        wguild.server[member.id].pname = after.nick
+    return
+
+@client.event
+async def on_message(message):
+    wguild = servers[message.guild.id]
+    if (message.author.id == 1211781489931452447) & ('👑' in message.content):
+        date = message.created_at.date() - dt.timedelta(days = 1)
+        check = calendar.get(date)
+        if check == None:
+            rip = ripScores(message.content, date, wguild)
+            scores = rip[0]
+            numPlayers = rip[1]
+            par = rip[2] / numPlayers
+            calendar[date] = Day(date, scores, channel, numPlayers, par, message.attachments[0].url)
+        elif channel == check.channel:
+            date = message.created_at.date()
+            rip = ripScores(message.content, date, wguild)
+            scores = rip[0]
+            numPlayers = rip[1]
+            par = rip[2] / numPlayers
+            calendar[date] = Day(date, scores, channel, numPlayers, par, message.attachments[0].url)
+        else:
+            newboard = ripScores(message.content, date, wguild)[0]
+            calendar[date].mergeLeaderboard(newboard, wguild)
+    for pid in wguild.server:
+        server[pid].scores = server[pid].scores[server[pid].scores[:, 2].argsort()[::-1]]       
+    pardata = np.array([calendar[day].par for day in calendar])
+    wguild.par_Q1 = np.quantile(pardata, 0.25)
+    wguild.par_Q2 = np.median(pardata)
+    wguild.par_Q3 = np.quantile(pardata, 0.75)
+    wguild.par_mean = np.mean(pardata)
+    return
 
 class HistoryView(ui.LayoutView):
     crowncol = "[1;33m"
@@ -639,11 +672,6 @@ async def best_streak(interaction: discord.Interaction, player: discord.Member):
     view.add_item(box)
     await interaction.response.send_message(view = view, ephemeral = True)
     return
-
-# Date:
-# Word: 
-# Par (Difficulty [based on quartiles of all time par data]):
-# Observed vs Expected scores:
 
 async def local_summary(interaction, date):
     wguild = servers[interaction.guild_id]
