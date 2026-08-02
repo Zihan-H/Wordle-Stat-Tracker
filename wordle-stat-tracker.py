@@ -10,6 +10,7 @@ import requests
 import datetime as dt
 import os
 import json
+import logging
 
 intents = discord.Intents.default()
 intents.members = True
@@ -18,6 +19,7 @@ intents.message_content = True
 client = discord.Client(intents = intents)
 tree = app_commands.CommandTree(client) 
 raw = requests.get('https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js').content[14:] # thanks chris
+logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler(sys.stdout)])
 
 servers = {}
 
@@ -189,7 +191,7 @@ async def prep_guild(guild):
     for member in guild.members:
         if not(member.bot):
             server[member.id] = Player(member.id, member.display_name)
-    print("server loaded")
+    logging.info("server loaded")
     count = 1
     for channel in guild.channels:
         if (type(channel) != discord.channel.CategoryChannel):
@@ -198,13 +200,13 @@ async def prep_guild(guild):
             try:
                 messagelist = [m async for m in channel.history(limit = 100, before = startpoint)]
             except(discord.Forbidden, discord.DiscordServerError):
-                print("skipping past inaccessible (private/empty) channel")
+                logging.info("skipping past inaccessible (private/empty) channel")
                 continue
-            print("new channel" + str(channel))
+            logging.info("new channel" + str(channel))
             while rep:
                 for message in messagelist:
                     if (message.author.id == 1211781489931452447) and ('👑' in message.content):
-                        print(count)
+                        logging.info(str(count))
                         count += 1
                         date = message.created_at.date() - dt.timedelta(days = 1)
                         check = calendar.get(date)
@@ -230,7 +232,7 @@ async def prep_guild(guild):
                     startpoint = messagelist[-1].created_at
                     messagelist = [m async for m in channel.history(limit = 100, before = startpoint)]
                 
-    print("messages loaded")
+    logging.info("messages loaded")
     for pid in server:
         server[pid].scores = server[pid].scores[server[pid].scores[:, 2].argsort()[::-1]]
         streak = 0
