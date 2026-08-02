@@ -1,6 +1,7 @@
 import discord
 from discord import app_commands
 from discord import ui
+from discord.ext import tasks
 import re
 import numpy as np
 import matplotlib.pyplot as plt
@@ -266,7 +267,7 @@ async def prep_guild(guild):
         wguild.par_mean = np.mean(pardata)
     return
     
-@discord.ext.tasks.loop(minutes = 10)
+@tasks.loop(minutes = 10)
 async def heartbeat():
     logging.info("a\na\na\na\nstaying alive\nstaying alive")
 
