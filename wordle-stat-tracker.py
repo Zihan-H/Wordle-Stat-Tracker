@@ -11,6 +11,7 @@ import datetime as dt
 import os
 import json
 import logging
+import sys
 
 intents = discord.Intents.default()
 intents.members = True
