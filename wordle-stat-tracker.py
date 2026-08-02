@@ -12,7 +12,7 @@ import os
 import json
 import logging
 import sys
-
+    
 intents = discord.Intents.default()
 intents.members = True
 intents.guilds = True
@@ -265,6 +265,10 @@ async def prep_guild(guild):
         wguild.par_Q3 = np.quantile(pardata, 0.75)
         wguild.par_mean = np.mean(pardata)
     return
+    
+@discord.ext.tasks.loop(minutes = 10)
+async def heartbeat():
+    logging.info("a\na\na\na\nstaying alive\nstaying alive")
 
 @client.event
 async def on_ready():
@@ -275,6 +279,7 @@ async def on_ready():
         servers[guild.id] = wguild
         await prep_guild(guild)
         wguild.init_sglobal()
+    heartbeat.start()
     return  
 
 @client.event
