@@ -274,8 +274,6 @@ async def on_ready():
     await tree.sync()
     print(f'We have logged in as {client.user}')
     for guild in client.guilds:
-        if guild.name == 'WCSS People':
-            continue
         wguild = WGuild(guild.id, guild.name, guild.owner)
         servers[guild.id] = wguild
         await prep_guild(guild)
@@ -1026,12 +1024,12 @@ def heartbeat():
     return "<p>staying alive</p>"
 
 def blood_circulator():
-    app.run(port = 4000)
+    app.run(host = '0.0.0.0', port = 4000)
 
 def boot_bot():
     client.run(TOKEN)
 
-t1 = threading.Thread(target = blood_circulator)
-t2 = threading.Thread(target = boot_bot)
-t1.start()
-t2.start()
+t = threading.Timer(10, boot_bot)
+t.start()
+blood_circulator()
+
