@@ -15,6 +15,7 @@ import logging
 import sys
 from flask import Flask
 import threading
+import time
 
 intents = discord.Intents.default()
 intents.members = True
@@ -47,8 +48,8 @@ class WGuild():
 
     def init_sglobal(self):
         data = json.loads(raw)
-        currdate = dt.date(2025, 6, 30) # https://discord.com/blog/discord-update-june-30-2025-changelog introduces discord's /wordle integration
-        for day in range(1472, int(list(data.keys())[-1])):
+        currdate = dt.date(2022, 8, 12)
+        for day in range(419, int(list(data.keys())[-1])):
             if currdate not in self.sglobal:
                 if str(day) in data:
                     wordle = data[str(day)]
@@ -230,7 +231,7 @@ async def prep_guild(guild):
                         else:
                             newboard = ripScores(message.content, date, wguild)[0]
                             calendar[date].mergeLeaderboard(newboard, wguild)
-                if len(messagelist) == 0:
+                if len(messagelist) < 100:
                     rep = False
                 else:
                     startpoint = messagelist[-1].created_at
@@ -278,7 +279,11 @@ async def on_ready():
         servers[guild.id] = wguild
         await prep_guild(guild)
         wguild.init_sglobal()
-    return  
+    for gid in servers:
+        print(gid)
+        print(servers[gid].gname)
+        print(servers[gid].server)
+    return
 
 @client.event
 async def on_guild_join(guild):
@@ -982,6 +987,7 @@ async def par_line(interaction: discord.Interaction, start: str | None, end: str
     ax.plot(np.arange(start, end + dt.timedelta(days = 1)), gdata, label = "Global Pars")
     ax.set_ylabel("Par")
     ax.set_xlabel("Date")
+    ax.legend()
     ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
     ax.yaxis.set_minor_locator(ticker.MultipleLocator(0.2))
     ax.xaxis.set_major_locator(mdates.DayLocator(interval = 7))
@@ -1030,7 +1036,8 @@ def blood_circulator():
 def boot_bot():
     client.run(TOKEN)
 
-t = threading.Timer(10, boot_bot)
+t = threading.Thread(target = blood_circulator)
 t.start()
-blood_circulator()
+time.sleep(10)
+boot_bot()
 
