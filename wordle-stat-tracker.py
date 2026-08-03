@@ -457,7 +457,7 @@ class CrownLossView(HistoryView):
 
 @tree.command(name = "history", description = "[player]'s last [x {default: 10}] Wordles since [start: {format: YYYY-MM-DD, default: today}}]")
 async def history(interaction: discord.Interaction, player: discord.Member, x: int | None, start: str | None):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     wguild = servers[interaction.guild_id]
     server = wguild.server
     calendar = wguild.calendar
@@ -468,7 +468,7 @@ async def history(interaction: discord.Interaction, player: discord.Member, x: i
         box = ui.Container(accent_colour = discord.Colour.magenta())
         box.add_item(ui.TextDisplay("Invalid x"))
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     try:
         start = dt.date.fromisoformat(start)
@@ -479,13 +479,13 @@ async def history(interaction: discord.Interaction, player: discord.Member, x: i
             box = ui.Container(accent_colour = discord.Colour.magenta())
             box.add_item(ui.TextDisplay("Invalid start date"))
             view.add_item(box)
-            await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+            await interaction.followup.send(view = view)
             return
     if player.id not in server:
         box = ui.Container(accent_colour = discord.Colour.magenta())
         box.add_item(ui.TextDisplay("Invalid player"))
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     pid = player.id
     if x == 401:
@@ -497,13 +497,13 @@ async def history(interaction: discord.Interaction, player: discord.Member, x: i
     scores = server[pid].scores[server[pid].scores[:, 2] <= start]
     scores = scores[scores[:, 2].argsort()[::-1]]
     view = HistoryView(scores[:x], "```" + " " * (int(np.log10(len(scores)) + 2)) + "     Date    | Wordle # |  Word   | Score |  Par  | Global Par ```", '', wguild)
-    await interaction.response.send_message(view = view, ephemeral = True)
+    await interaction.followup.send(view = view)
     return
 
 @tree.command(name = "line", description = "Line graph for [player] from [start {default: oldest Wordle}] to [end {default: most recent Wordle}]")
 @app_commands.describe(start = "format: YYYY-MM-DD", end = "format: YYYY-MM-DD")
 async def line(interaction: discord.Interaction, player: discord.Member, start: str | None, end: str | None):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     BASE_LOSS_WEIGHT = servers[interaction.guild_id].BASE_LOSS_WEIGHT
     view = ui.LayoutView()
@@ -511,7 +511,7 @@ async def line(interaction: discord.Interaction, player: discord.Member, start: 
         box = ui.Container(accent_colour = discord.Colour.magenta())
         box.add_item(ui.TextDisplay("Invalid player"))
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     try:
         start = dt.date.fromisoformat(start)
@@ -522,7 +522,7 @@ async def line(interaction: discord.Interaction, player: discord.Member, start: 
             box = ui.Container(accent_colour = discord.Colour.magenta())
             box.add_item(ui.TextDisplay("Invalid start date"))
             view.add_item(box)
-            await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+            await interaction.followup.send(view = view)
             return
     try:
         end = dt.date.fromisoformat(end)
@@ -533,7 +533,7 @@ async def line(interaction: discord.Interaction, player: discord.Member, start: 
             box = ui.Container(accent_colour = discord.Colour.magenta())
             box.add_item(ui.TextDisplay("Invalid end date"))
             view.add_item(box)
-            await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+            await interaction.followup.send(view = view)
             return
     player = server[player.id]
     data = player.scores[player.scores[:, 2] >= start]
@@ -566,21 +566,21 @@ async def line(interaction: discord.Interaction, player: discord.Member, start: 
     ax.set_ylabel("Score")
     ax.set_title(player.pname)
     fig.savefig("%s.png" % str(player.pid), bbox_inches = "tight", dpi = 100)
-    await interaction.response.send_message(file = discord.File("%s.png" % str(player.pid)), ephemeral = True)
+    await interaction.followup.send(file = discord.File("%s.png" % str(player.pid)))
     os.remove("%s.png" % str(player.pid))
     return
 
 @tree.command(name = "bar", description = "Bar chart for [player] from [start {default: oldest Wordle}] to [end {default: most recent Wordle}]")
 @app_commands.describe(start = "format: YYYY-MM-DD", end = "format: YYYY-MM-DD")
 async def bar(interaction: discord.Interaction, player: discord.Member, start: str | None, end: str | None):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     view = ui.LayoutView()
     if player.id not in server:
         box = ui.Container(accent_colour = discord.Colour.magenta())
         box.add_item(ui.TextDisplay("Invalid player"))
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     try:
         start = dt.date.fromisoformat(start)
@@ -591,7 +591,7 @@ async def bar(interaction: discord.Interaction, player: discord.Member, start: s
             box = ui.Container(accent_colour = discord.Colour.magenta())
             box.add_item(ui.TextDisplay("Invalid start date"))
             view.add_item(box)
-            await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+            await interaction.followup.send(view = view)
             return
     try:
         end = dt.date.fromisoformat(end)
@@ -602,7 +602,7 @@ async def bar(interaction: discord.Interaction, player: discord.Member, start: s
             box = ui.Container(accent_colour = discord.Colour.magenta())
             box.add_item(ui.TextDisplay("Invalid end date"))
             view.add_item(box)
-            await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+            await interaction.followup.send(view = view)
             return
     player = server[player.id]
     data = player.scores[player.scores[:, 2] >= start]
@@ -625,13 +625,13 @@ async def bar(interaction: discord.Interaction, player: discord.Member, start: s
     ax.grid(visible = True, axis = 'y', which = 'both')
     bars.patches[-1].set(color = "xkcd:crimson")
     fig.savefig("%s.png" % str(player.pid))
-    await interaction.response.send_message(file = discord.File("%s.png" % str(player.pid)), ephemeral = True)
+    await interaction.followup.send(file = discord.File("%s.png" % str(player.pid)))
     os.remove("%s.png" % str(player.pid))
     return
 
 @tree.command(name = "crowns", description = "Number of times [player] got top score on the Wordle")
 async def crowns(interaction: discord.Interaction, player: discord.Member, secret: int | None):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     calendar = servers[interaction.guild_id].calendar
     if player.id not in server:
@@ -639,18 +639,18 @@ async def crowns(interaction: discord.Interaction, player: discord.Member, secre
         box = ui.Container(accent_colour = discord.Colour.magenta())
         box.add_item(ui.TextDisplay("Invalid player"))
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     pid = player.id
     if secret != None:
         pid = secret
     view = CrownLossView(server[pid].scores[list(server[pid].scores[:, 1])], f"You have won {server[pid].crowns} crowns:", '👑', servers[interaction.guild_id])
-    await interaction.response.send_message(view = view, ephemeral = True)
+    await interaction.followup.send(view = view)
     return
 
 @tree.command(name = "fails", description = "Number of times [player] failed to solve the Wordle")
 async def fails(interaction: discord.Interaction, player: discord.Member, secret: int | None):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     calendar = servers[interaction.guild_id].calendar
     if player.id not in server:
@@ -658,83 +658,83 @@ async def fails(interaction: discord.Interaction, player: discord.Member, secret
         box = ui.Container(accent_colour = discord.Colour.magenta())
         box.add_item(ui.TextDisplay("Invalid player"))
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     pid = player.id
     if secret != None:
         pid = secret
     view = CrownLossView(server[pid].scores[server[pid].scores[:, 0] == 'X'], f"{player.display_name} has failed to solve {server[pid].losses} Wordles:", '❌', servers[interaction.guild_id])
-    await interaction.response.send_message(view = view, ephemeral = True)
+    await interaction.followup.send(view = view)
     return
 
 @tree.command(name = "solved", description = "Number of times [player] solved the Wordle")
 async def solved(interaction: discord.Interaction, player: discord.Member):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     view = ui.LayoutView()
     if player.id not in server:
         box = ui.Container(accent_colour = discord.Colour.magenta())
         box.add_item(ui.TextDisplay("Invalid player"))
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     box = ui.Container(ui.TextDisplay(f"{player.display_name} has solved {(server[player.id].numgames - server[player.id].losses)} Wordles"), accent_colour = discord.Colour.brand_green())
     view.add_item(box)
-    await interaction.response.send_message(view = view, ephemeral = True)
+    await interaction.followup.send(view = view)
     return
 
 @tree.command(name = "games_played", description = "Number of times [player] played the Wordle")
 async def games_played(interaction: discord.Interaction, player: discord.Member):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     view = ui.LayoutView()
     if player.id not in server:
         box = ui.Container(accent_colour = discord.Colour.magenta())
         box.add_item(ui.TextDisplay("Invalid player"))
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     box = ui.Container(ui.TextDisplay(f"{player.display_name} has played {server[player.id].numgames} Wordles"), accent_colour = discord.Colour.purple())
     view.add_item(box)
-    await interaction.response.send_message(view = view, ephemeral = True)
+    await interaction.followup.send(view = view)
     return
 
 @tree.command(name = "crown_rate", description = "% of all played Wordles where [player] won a crown")
 async def crown_rate(interaction: discord.Interaction, player: discord.Member):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     view = ui.LayoutView()
     if player.id not in server:
         box = ui.Container(accent_colour = discord.Colour.magenta())
         box.add_item(ui.TextDisplay("Invalid player"))
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     box = ui.Container(ui.TextDisplay("%s has earned a crown in %.2f%% Wordles" % (player.display_name, 100 * np.round((server[player.id].crowns / server[player.id].numgames), decimals = 2))), accent_colour = discord.Colour.gold())
     view.add_item(box)
-    await interaction.response.send_message(view = view, ephemeral = True)
+    await interaction.followup.send(view = view)
     return
 
 @tree.command(name = "fail_rate", description = "% of all played Wordles [player] failed to solve")
 async def fail_rate(interaction: discord.Interaction, player: discord.Member):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     view = ui.LayoutView()
     if player.id not in server:
         box = ui.Container(accent_colour = discord.Colour.magenta())
         box.add_item(ui.TextDisplay("Invalid player"))
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     box = ui.Container(ui.TextDisplay("%s has failed to solve %.2f%% of their Wordles" % (player.display_name, 100 * np.round((server[player.id].losses / server[player.id].numgames), decimals = 2))), accent_colour = discord.Colour.red())
     view.add_item(box)
-    await interaction.response.send_message(view = view, ephemeral = True)
+    await interaction.followup.send(view = view)
     return
 
 @tree.command(name = "average", description = "[player]'s average score over the last [x {default: all solved<OPT: played> Wordles}] Wordles")
 @app_commands.describe(losses = "<OPT: if losses = True, includes losses scored with the server's BASE_LOSS_WEIGHT>")
 async def average(interaction: discord.Interaction, player: discord.Member, x: int | None, losses: bool | None):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     BASE_LOSS_WEIGHT = servers[interaction.guild_id].BASE_LOSS_WEIGHT
     view = ui.LayoutView()
@@ -742,7 +742,7 @@ async def average(interaction: discord.Interaction, player: discord.Member, x: i
         box = ui.Container(accent_colour = discord.Colour.magenta())
         box.add_item(ui.TextDisplay("Invalid player"))
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     raw = server[player.id].scores[:, 0]
     scores = []
@@ -751,7 +751,7 @@ async def average(interaction: discord.Interaction, player: discord.Member, x: i
         if len(scores) == 0:
             box = ui.Container(ui.TextDisplay("Go solve more Wordles, buddy"), accent_colour = discord.Colour.red())
             view.add_item(box)
-            await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+            await interaction.followup.send(view = view)
             return
     else:
         for score in raw:
@@ -764,45 +764,45 @@ async def average(interaction: discord.Interaction, player: discord.Member, x: i
     if x <= 0:
         box = ui.Container(ui.TextDisplay("Invalid x"), accent_colour = discord.Colour.red())
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     average = sum(scores[:x]) / x
     box = ui.Container(ui.TextDisplay("%s has an average Wordle score of %.2f, %s" % (player.display_name, np.round(average, decimals = 2), "excluding losses." if (losses == None) else "including losses as a score of %.2f / 6" % BASE_LOSS_WEIGHT)), accent_colour = discord.Colour.teal())    
     view.add_item(box)
-    await interaction.response.send_message(view = view, ephemeral = True)
+    await interaction.followup.send(view = view)
     return
 
 @tree.command(name = "current_streak", description = "[player]'s current Wordle solving streak")
 async def current_streak(interaction: discord.Interaction, player: discord.Member):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     if player.id not in server:
         view = ui.LayoutView()
         box = ui.Container(accent_colour = discord.Colour.magenta())
         box.add_item(ui.TextDisplay("Invalid player"))
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     box = ui.Container(ui.TextDisplay("%s currently has a %i Wordle solving streak" % (player.display_name, server[player.id].currstreak)), accent_colour = discord.Colour.orange())
     view = ui.LayoutView()
     view.add_item(box)
-    await interaction.response.send_message(view = view, ephemeral = True)
+    await interaction.followup.send(view = view)
     return
 
 @tree.command(name = "best_streak", description = "[player]'s all time best Wordle solving streak")
 async def best_streak(interaction: discord.Interaction, player: discord.Member):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     view = ui.LayoutView()
     if player.id not in server:
         box = ui.Container(accent_colour = discord.Colour.magenta())
         box.add_item(ui.TextDisplay("Invalid player"))
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     box = ui.Container(ui.TextDisplay("%s's all time best Wordle streak %s %i %s long" % (player.display_name, ("is ongoing and currently" if (server[player.id].currstreak == server[player.id].maxstreak) else "was"), server[player.id].maxstreak, ("day" if (server[player.id].maxstreak == 1) else "days"))), accent_colour = discord.Colour.orange())
     view.add_item(box)
-    await interaction.response.send_message(view = view, ephemeral = True)
+    await interaction.followup.send(view = view)
     return
 
 async def local_summary(interaction, date, pars_from_server):
@@ -820,7 +820,7 @@ async def local_summary(interaction, date, pars_from_server):
         box = ui.Container(accent_colour = discord.Colour.magenta())
         box.add_item(ui.TextDisplay("No recorded Wordle on given date"))
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     day = calendar[date]
     if pars_from_server:
@@ -862,19 +862,19 @@ async def local_summary(interaction, date, pars_from_server):
     box = ui.Section(data, accessory = ui.Thumbnail(media = day.image))
     cont = ui.Container(box, accent_colour = discord.Colour.blurple())
     view.add_item(cont)
-    await interaction.response.send_message(view = view, ephemeral = True)
+    await interaction.followup.send(view = view)
     return
 
 @tree.command(name = "summary", description = "Summary info on [date {format: YYYY-MM-DD}]'s Wordle")
 @app_commands.describe(pars_from_server = "<OPT: if True, uses server data for pars/difficulty ranking, else uses global data")
 async def summary(interaction: discord.Interaction, date: str, pars_from_server: bool | None):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     await local_summary(interaction, date, False if pars_from_server == None else pars_from_server)
 
 @tree.command(name = "hardest", description = "Hardest of the last [x {default: all Wordles}] Wordles with [at_least {default: 1}] players")
 @app_commands.describe(pars_from_server = "<OPT: if True, uses server data for pars/difficulty ranking, else uses global data")
 async def hardest(interaction: discord.Interaction, x: int | None, at_least: int | None, pars_from_server: bool | None):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     calendar = servers[interaction.guild_id].calendar
     view = ui.LayoutView()
     if x == None:
@@ -882,14 +882,14 @@ async def hardest(interaction: discord.Interaction, x: int | None, at_least: int
     elif x <= 0:
         box = ui.Container(ui.TextDisplay("Invalid x"), accent_colour = discord.Colour.red())
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     if at_least == None:
         at_least = 1
     elif at_least <= 0:
         box = ui.Container(ui.TextDisplay("Invalid at_least"), accent_colour = discord.Colour.red())
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     if pars_from_server == None:
         pars_from_server = False
@@ -906,7 +906,7 @@ async def hardest(interaction: discord.Interaction, x: int | None, at_least: int
     if maxdate == None:
         box = ui.Container(ui.TextDisplay("No Wordle in the server meets the condition of having at least %i players" % at_least), accent_colour = discord.Colour.red())
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     await local_summary(interaction, maxdate.isoformat(), pars_from_server)
     return
@@ -914,7 +914,7 @@ async def hardest(interaction: discord.Interaction, x: int | None, at_least: int
 @tree.command(name = "easiest", description = "Easiest of the last [x {default: all Wordles}] Wordles with [at_least {default: 1}] players")
 @app_commands.describe(pars_from_server = "<OPT: if True, uses server data for pars/difficulty ranking, else uses global data")
 async def easiest(interaction: discord.Interaction, x: int | None, at_least: int | None, pars_from_server: bool | None):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     calendar = servers[interaction.guild_id].calendar
     view = ui.LayoutView()
     if x == None:
@@ -922,14 +922,14 @@ async def easiest(interaction: discord.Interaction, x: int | None, at_least: int
     elif x <= 0:
         box = ui.Container(ui.TextDisplay("Invalid x"), accent_colour = discord.Colour.red())
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     if at_least == None:
         at_least = 1
     elif at_least <= 0:
         box = ui.Container(ui.TextDisplay("Invalid at_least"), accent_colour = discord.Colour.red())
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     if pars_from_server == None:
         pars_from_server = False
@@ -946,7 +946,7 @@ async def easiest(interaction: discord.Interaction, x: int | None, at_least: int
     if mindate == None:
         box = ui.Container(ui.TextDisplay("No Wordle in the server meets the condition of having at least %i players" % at_least), accent_colour = discord.Colour.red())
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     await local_summary(interaction, mindate.isoformat(), pars_from_server)
     return
@@ -954,7 +954,7 @@ async def easiest(interaction: discord.Interaction, x: int | None, at_least: int
 @tree.command(name = "par_line", description = "Line graph of pars from [start {default: oldest Wordle}] to [end {default: most recent Wordle}]")
 @app_commands.describe(start = "format: YYYY-MM-DD", end = "format: YYYY-MM-DD")
 async def par_line(interaction: discord.Interaction, start: str | None, end: str | None):
-    interaction.response.defer(ephemeral = True, thinking = True)
+    await interaction.response.defer(ephemeral = True, thinking = True)
     calendar = servers[interaction.guild_id].calendar
     view = ui.LayoutView()
     try:
@@ -966,7 +966,7 @@ async def par_line(interaction: discord.Interaction, start: str | None, end: str
             box = ui.Container(accent_colour = discord.Colour.magenta())
             box.add_item(ui.TextDisplay("Invalid start date"))
             view.add_item(box)
-            await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+            await interaction.followup.send(view = view)
             return
     try:
         end = dt.date.fromisoformat(end)
@@ -977,7 +977,7 @@ async def par_line(interaction: discord.Interaction, start: str | None, end: str
             box = ui.Container(accent_colour = discord.Colour.magenta())
             box.add_item(ui.TextDisplay("Invalid end date"))
             view.add_item(box)
-            await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+            await interaction.followup.send(view = view)
             return
     data = []
     gdata = []
@@ -1008,30 +1008,31 @@ async def par_line(interaction: discord.Interaction, start: str | None, end: str
     ax.grid(visible = True, axis = 'both', which = 'minor', lw = 1)
     ax.tick_params(axis = 'x', labelrotation = 90)
     fig.savefig("par-overview.png", bbox_inches = "tight")
-    await interaction.response.send_message(file = discord.File("par-overview.png"), ephemeral = True)
+    await interaction.followup.send(file = discord.File("par-overview.png"))
     os.remove("par-overview.png")
     return
 
 @tree.command(name = "set_base_loss_weight", description = "OWNER ONLY: Sets losses as a score of [x {default: 7.5}] / 6 for pars/averages")
 async def set_base_loss_weight(interaction: discord.Interaction, x: int | None):
+    await interaction.response.defer()
     wguild = servers[interaction.guild_id]
     view = ui.LayoutView()
     if interaction.user != wguild.owner:
         box = ui.Container(ui.TextDisplay("nuh uh uh"), accent_colour = discord.Colour.red())
         view.add_item(box)
-        await interaction.response.send_message(view = view, ephemeral = True, delete_after = 15)
+        await interaction.followup.send(view = view)
         return
     if x == None:
         x = 7.5
     wguild.BASE_LOSS_WEIGHT = x
     box = ui.Container(ui.TextDisplay("Base loss weight set to %.2f / 6. Recalibrating database now." % np.round(x, decimals = 3)), accent_colour = discord.Colour.blurple())
     view.add_item(box)
-    await interaction.response.send_message(view = view, ephemeral = True)
+    first = await interaction.followup.send(view = view)
     await prep_guild(interaction.guild)
     wguild.init_sglobal()
     box = ui.Container(ui.TextDisplay("Calibration complete. Commands now recognize the new base loss weight of %.2f." % np.round(x, decimals = 3)), accent_colour = discord.Colour.green())
     view.add_item(box)
-    await interaction.edit_original_response(view = view)
+    await interaction.followup.edit_message(first.id, view = view)
     return
 
 TOKEN = os.environ['TOKEN']
