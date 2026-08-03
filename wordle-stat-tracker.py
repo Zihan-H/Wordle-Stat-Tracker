@@ -502,6 +502,7 @@ async def history(interaction: discord.Interaction, player: discord.Member, x: i
 @app_commands.describe(start = "format: YYYY-MM-DD", end = "format: YYYY-MM-DD")
 async def line(interaction: discord.Interaction, player: discord.Member, start: str | None, end: str | None):
     server = servers[interaction.guild_id].server
+    BASE_LOSS_WEIGHT = servers[interaction.guild_id].BASE_LOSS_WEIGHT
     view = ui.LayoutView()
     if player.id not in server:
         box = ui.Container(accent_colour = discord.Colour.magenta())
