@@ -13,6 +13,13 @@ import os
 import json
 import logging
 import sys
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def heartbeat():
+    return "<p>staying alive</p>"
     
 intents = discord.Intents.default()
 intents.members = True
