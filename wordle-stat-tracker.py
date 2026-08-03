@@ -279,10 +279,6 @@ async def on_ready():
         servers[guild.id] = wguild
         await prep_guild(guild)
         wguild.init_sglobal()
-    for gid in servers:
-        print(gid)
-        print(servers[gid].gname)
-        print(servers[gid].server)
     return
 
 @client.event
@@ -461,6 +457,7 @@ class CrownLossView(HistoryView):
 
 @tree.command(name = "history", description = "[player]'s last [x {default: 10}] Wordles since [start: {format: YYYY-MM-DD, default: today}}]")
 async def history(interaction: discord.Interaction, player: discord.Member, x: int | None, start: str | None):
+    interaction.response.defer(ephemeral = True, thinking = True)
     wguild = servers[interaction.guild_id]
     server = wguild.server
     calendar = wguild.calendar
@@ -506,6 +503,7 @@ async def history(interaction: discord.Interaction, player: discord.Member, x: i
 @tree.command(name = "line", description = "Line graph for [player] from [start {default: oldest Wordle}] to [end {default: most recent Wordle}]")
 @app_commands.describe(start = "format: YYYY-MM-DD", end = "format: YYYY-MM-DD")
 async def line(interaction: discord.Interaction, player: discord.Member, start: str | None, end: str | None):
+    interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     BASE_LOSS_WEIGHT = servers[interaction.guild_id].BASE_LOSS_WEIGHT
     view = ui.LayoutView()
@@ -575,6 +573,7 @@ async def line(interaction: discord.Interaction, player: discord.Member, start: 
 @tree.command(name = "bar", description = "Bar chart for [player] from [start {default: oldest Wordle}] to [end {default: most recent Wordle}]")
 @app_commands.describe(start = "format: YYYY-MM-DD", end = "format: YYYY-MM-DD")
 async def bar(interaction: discord.Interaction, player: discord.Member, start: str | None, end: str | None):
+    interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     view = ui.LayoutView()
     if player.id not in server:
@@ -632,6 +631,7 @@ async def bar(interaction: discord.Interaction, player: discord.Member, start: s
 
 @tree.command(name = "crowns", description = "Number of times [player] got top score on the Wordle")
 async def crowns(interaction: discord.Interaction, player: discord.Member, secret: int | None):
+    interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     calendar = servers[interaction.guild_id].calendar
     if player.id not in server:
@@ -650,6 +650,7 @@ async def crowns(interaction: discord.Interaction, player: discord.Member, secre
 
 @tree.command(name = "fails", description = "Number of times [player] failed to solve the Wordle")
 async def fails(interaction: discord.Interaction, player: discord.Member, secret: int | None):
+    interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     calendar = servers[interaction.guild_id].calendar
     if player.id not in server:
@@ -668,6 +669,7 @@ async def fails(interaction: discord.Interaction, player: discord.Member, secret
 
 @tree.command(name = "solved", description = "Number of times [player] solved the Wordle")
 async def solved(interaction: discord.Interaction, player: discord.Member):
+    interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     view = ui.LayoutView()
     if player.id not in server:
@@ -683,6 +685,7 @@ async def solved(interaction: discord.Interaction, player: discord.Member):
 
 @tree.command(name = "games_played", description = "Number of times [player] played the Wordle")
 async def games_played(interaction: discord.Interaction, player: discord.Member):
+    interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     view = ui.LayoutView()
     if player.id not in server:
@@ -698,6 +701,7 @@ async def games_played(interaction: discord.Interaction, player: discord.Member)
 
 @tree.command(name = "crown_rate", description = "% of all played Wordles where [player] won a crown")
 async def crown_rate(interaction: discord.Interaction, player: discord.Member):
+    interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     view = ui.LayoutView()
     if player.id not in server:
@@ -713,6 +717,7 @@ async def crown_rate(interaction: discord.Interaction, player: discord.Member):
 
 @tree.command(name = "fail_rate", description = "% of all played Wordles [player] failed to solve")
 async def fail_rate(interaction: discord.Interaction, player: discord.Member):
+    interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     view = ui.LayoutView()
     if player.id not in server:
@@ -729,6 +734,7 @@ async def fail_rate(interaction: discord.Interaction, player: discord.Member):
 @tree.command(name = "average", description = "[player]'s average score over the last [x {default: all solved<OPT: played> Wordles}] Wordles")
 @app_commands.describe(losses = "<OPT: if losses = True, includes losses scored with the server's BASE_LOSS_WEIGHT>")
 async def average(interaction: discord.Interaction, player: discord.Member, x: int | None, losses: bool | None):
+    interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     BASE_LOSS_WEIGHT = servers[interaction.guild_id].BASE_LOSS_WEIGHT
     view = ui.LayoutView()
@@ -768,6 +774,7 @@ async def average(interaction: discord.Interaction, player: discord.Member, x: i
 
 @tree.command(name = "current_streak", description = "[player]'s current Wordle solving streak")
 async def current_streak(interaction: discord.Interaction, player: discord.Member):
+    interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     if player.id not in server:
         view = ui.LayoutView()
@@ -784,6 +791,7 @@ async def current_streak(interaction: discord.Interaction, player: discord.Membe
 
 @tree.command(name = "best_streak", description = "[player]'s all time best Wordle solving streak")
 async def best_streak(interaction: discord.Interaction, player: discord.Member):
+    interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     view = ui.LayoutView()
     if player.id not in server:
@@ -860,11 +868,13 @@ async def local_summary(interaction, date, pars_from_server):
 @tree.command(name = "summary", description = "Summary info on [date {format: YYYY-MM-DD}]'s Wordle")
 @app_commands.describe(pars_from_server = "<OPT: if True, uses server data for pars/difficulty ranking, else uses global data")
 async def summary(interaction: discord.Interaction, date: str, pars_from_server: bool | None):
+    interaction.response.defer(ephemeral = True, thinking = True)
     await local_summary(interaction, date, False if pars_from_server == None else pars_from_server)
 
 @tree.command(name = "hardest", description = "Hardest of the last [x {default: all Wordles}] Wordles with [at_least {default: 1}] players")
 @app_commands.describe(pars_from_server = "<OPT: if True, uses server data for pars/difficulty ranking, else uses global data")
 async def hardest(interaction: discord.Interaction, x: int | None, at_least: int | None, pars_from_server: bool | None):
+    interaction.response.defer(ephemeral = True, thinking = True)
     calendar = servers[interaction.guild_id].calendar
     view = ui.LayoutView()
     if x == None:
@@ -904,6 +914,7 @@ async def hardest(interaction: discord.Interaction, x: int | None, at_least: int
 @tree.command(name = "easiest", description = "Easiest of the last [x {default: all Wordles}] Wordles with [at_least {default: 1}] players")
 @app_commands.describe(pars_from_server = "<OPT: if True, uses server data for pars/difficulty ranking, else uses global data")
 async def easiest(interaction: discord.Interaction, x: int | None, at_least: int | None, pars_from_server: bool | None):
+    interaction.response.defer(ephemeral = True, thinking = True)
     calendar = servers[interaction.guild_id].calendar
     view = ui.LayoutView()
     if x == None:
@@ -943,6 +954,7 @@ async def easiest(interaction: discord.Interaction, x: int | None, at_least: int
 @tree.command(name = "par_line", description = "Line graph of pars from [start {default: oldest Wordle}] to [end {default: most recent Wordle}]")
 @app_commands.describe(start = "format: YYYY-MM-DD", end = "format: YYYY-MM-DD")
 async def par_line(interaction: discord.Interaction, start: str | None, end: str | None):
+    interaction.response.defer(ephemeral = True, thinking = True)
     calendar = servers[interaction.guild_id].calendar
     view = ui.LayoutView()
     try:
