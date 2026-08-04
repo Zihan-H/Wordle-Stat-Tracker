@@ -496,7 +496,7 @@ async def history(interaction: discord.Interaction, player: discord.Member, x: i
         pid = 2
     scores = server[pid].scores[server[pid].scores[:, 2] <= start]
     scores = scores[scores[:, 2].argsort()[::-1]]
-    view = HistoryView(scores[:x], "```" + " " * (int(np.log10(len(scores)) + 2)) + "    Date    | Wordle # |  Word   | Score |  Par  | GPar ```", '', wguild)
+    view = HistoryView(scores[:x], "```" + " " * (int(np.log10(len(scores)) + 2)) + "    Date    | Wordle # |  Word   | Score |  Par  |  GPar ```", '', wguild)
     await interaction.followup.send(view = view)
     return
 
