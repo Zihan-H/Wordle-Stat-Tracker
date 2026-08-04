@@ -387,7 +387,7 @@ class HistoryView(ui.LayoutView):
             data += "[0m"
             data += "   | "
             data += "%.3f" % np.round(day.par, decimals = 3)
-            data += " |   "
+            data += " | "
             if wguild.sglobal[row[2]] != None:
                 data += "%.3f ```" % np.round(wguild.sglobal[row[2]], decimals = 3)
             else:
@@ -496,7 +496,7 @@ async def history(interaction: discord.Interaction, player: discord.Member, x: i
         pid = 2
     scores = server[pid].scores[server[pid].scores[:, 2] <= start]
     scores = scores[scores[:, 2].argsort()[::-1]]
-    view = HistoryView(scores[:x], "```" + " " * (int(np.log10(len(scores)) + 2)) + "     Date    | Wordle # |  Word   | Score |  Par  | GPar ```", '', wguild)
+    view = HistoryView(scores[:x], "```" + " " * (int(np.log10(len(scores)) + 2)) + "    Date    | Wordle # |  Word   | Score |  Par  | GPar ```", '', wguild)
     await interaction.followup.send(view = view)
     return
 
