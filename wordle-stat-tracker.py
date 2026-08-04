@@ -306,9 +306,12 @@ async def on_member_update(before, after):
 @client.event
 async def on_message(message):
     if (message.author.id == 1211781489931452447) & ('👑' in message.content):
+        logging.info('New Wordle Detected from %i' % message.guild.id)
+        logging.info(message.content)
         wguild = servers[message.guild.id]
         date = message.created_at.date() - dt.timedelta(days = 1)
         check = calendar.get(date)
+        logging.info(date)
         if check == None:
             rip = ripScores(message.content, date, wguild)
             scores = rip[0]
@@ -332,9 +335,11 @@ async def on_message(message):
         wguild.par_Q2 = np.median(pardata)
         wguild.par_Q3 = np.quantile(pardata, 0.75)
         wguild.par_mean = np.mean(pardata)
+        logging.info("messages loaded")
         if date not in wguild.sglobal:
             raw = requests.get('https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js').content[14:]
             wguild.init_sglobal()
+        logging.info("global updated")
     return
 
 class HistoryView(ui.LayoutView):
