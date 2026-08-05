@@ -309,6 +309,7 @@ async def on_message(message):
         logging.info('New Wordle Detected from %i' % message.guild.id)
         logging.info(message.content)
         wguild = servers[message.guild.id]
+        calendar = wguild.calendar
         date = message.created_at.date() - dt.timedelta(days = 1)
         check = calendar.get(date)
         logging.info(date)
