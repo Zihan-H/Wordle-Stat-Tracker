@@ -310,6 +310,7 @@ async def on_message(message):
         logging.info(message.content)
         wguild = servers[message.guild.id]
         calendar = wguild.calendar
+        server = wguild.server
         date = message.created_at.date() - dt.timedelta(days = 1)
         check = calendar.get(date)
         logging.info(date)
@@ -329,7 +330,7 @@ async def on_message(message):
         else:
             newboard = ripScores(message.content, date, wguild)[0]
             calendar[date].mergeLeaderboard(newboard, wguild)
-        for pid in wguild.server:
+        for pid in server:
             server[pid].scores = server[pid].scores[server[pid].scores[:, 2].argsort()[::-1]]       
         pardata = np.array([calendar[day].par for day in calendar])
         wguild.par_Q1 = np.quantile(pardata, 0.25)
