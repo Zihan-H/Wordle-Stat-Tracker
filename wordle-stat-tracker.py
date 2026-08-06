@@ -534,7 +534,7 @@ async def line(interaction: discord.Interaction, player: discord.Member, start: 
         end = dt.date.fromisoformat(end)
     except(ValueError, TypeError):
         if end == None:
-            end = dt.date.today()
+            end = dt.date.today() - dt.timedelta(days = 1)
         else:
             box = ui.Container(accent_colour = discord.Colour.magenta())
             box.add_item(ui.TextDisplay("Invalid end date"))
@@ -603,7 +603,7 @@ async def bar(interaction: discord.Interaction, player: discord.Member, start: s
         end = dt.date.fromisoformat(end)
     except(ValueError, TypeError):
         if end == None:
-            end = dt.date.today()
+            end = dt.date.today() - dt.timedelta(days = 1)
         else:
             box = ui.Container(accent_colour = discord.Colour.magenta())
             box.add_item(ui.TextDisplay("Invalid end date"))
@@ -996,7 +996,7 @@ async def par_line(interaction: discord.Interaction, start: str | None, end: str
         if date in servers[interaction.guild_id].sglobal:
             gdata += [servers[interaction.guild_id].sglobal[date]]
         else:
-            data += [None]
+            gdata += [None]
     data = np.array(data)
     fig = plt.figure(figsize=(max(len(data) * 0.125, 8), 4.8))
     ax = fig.add_subplot()
