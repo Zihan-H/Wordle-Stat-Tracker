@@ -23,7 +23,7 @@ intents.guilds = True
 intents.message_content = True
 client = discord.Client(intents = intents)
 tree = app_commands.CommandTree(client) 
-raw = requests.get('https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js').content[14:] # thanks chris
+raw = requests.get('https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js', verify = False).content[14:] # thanks chris
 logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler(sys.stdout)])
 
 servers = {}
@@ -338,9 +338,9 @@ async def on_message(message):
         wguild.par_Q3 = np.quantile(pardata, 0.75)
         wguild.par_mean = np.mean(pardata)
         logging.info("messages loaded")
-        if date not in wguild.sglobal:
-            raw = requests.get('https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js').content[14:]
-            wguild.init_sglobal()
+        if calendar[date].wordlenum not in json.loads(raw):
+            raw = requests.get('https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js', verify = False).content[14:]
+        wguild.init_sglobal()
         logging.info("global updated")
     return
 
