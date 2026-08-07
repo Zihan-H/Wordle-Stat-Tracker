@@ -339,7 +339,7 @@ async def on_message(message):
         wguild.par_mean = np.mean(pardata)
         logging.info("messages loaded")
         if calendar[date].wordlenum not in json.loads(raw):
-            raw = requests.get('https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js', verify = "_.engaging-data.com.crt").content[14:]
+            raw = requests.get('https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js', verify = "./_.engaging-data.com.crt").content[14:]
         wguild.init_sglobal()
         logging.info("global updated")
     return
