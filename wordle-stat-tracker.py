@@ -47,6 +47,7 @@ class WGuild():
         self.gpar_mean = 0
 
     def init_sglobal(self):
+        global raw
         data = json.loads(raw)
         currdate = dt.date(2022, 8, 12)
         for day in range(419, int(list(data.keys())[-1])):
@@ -338,6 +339,7 @@ async def on_message(message):
         wguild.par_Q3 = np.quantile(pardata, 0.75)
         wguild.par_mean = np.mean(pardata)
         logging.info("messages loaded")
+        global raw
         if calendar[date].wordlenum not in json.loads(raw):
             raw = requests.get('https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js', verify = False).content[14:]
         wguild.init_sglobal()
