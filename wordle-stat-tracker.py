@@ -23,7 +23,7 @@ intents.guilds = True
 intents.message_content = True
 client = discord.Client(intents = intents)
 tree = app_commands.CommandTree(client) 
-raw = requests.get('https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js', verify = False).content[14:] # thanks chris
+raw = requests.request('GET', 'https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js', verify = False).content[14:] # thanks chris
 logging.basicConfig(level=logging.INFO, handlers=[logging.StreamHandler(sys.stdout)])
 
 servers = {}
@@ -341,7 +341,7 @@ async def on_message(message):
         logging.info("messages loaded")
         global raw
         if str(calendar[date].wordlenum) not in json.loads(raw):
-            raw = requests.get('https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js', verify = False).content[14:]
+            raw = requests.request('GET', 'https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js', verify = False).content[14:]
         wguild.init_sglobal()
         logging.info("global updated")
     return
@@ -1062,4 +1062,5 @@ t = threading.Thread(target = blood_circulator)
 t.start()
 time.sleep(10)
 boot_bot()
+# this app is multithreading for an amazing reason
 
