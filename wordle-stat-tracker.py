@@ -401,7 +401,7 @@ class HistoryView(ui.LayoutView):
             if wguild.sglobal[row[2]] != None:
                 data += "%.3f ```" % np.round(wguild.sglobal[row[2]], decimals = 3)
             else:
-                data += "UNAVAILABLE ```"
+                data += "N/A ```"
             box.add_item(ui.TextDisplay(data))
             box.add_item(ui.Separator())
 
