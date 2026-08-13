@@ -51,7 +51,7 @@ class WGuild():
         data = json.loads(raw)
         currdate = dt.date(2022, 8, 12)
         logging.info(self.calendar)
-        logging.info(list(self.calendar.keys())
+        logging.info(list(self.calendar.keys()))
         for day in range(419, self.calendar[list(self.calendar.keys())[0]].wordlenum):
             if currdate not in self.sglobal:
                 if str(day) in data:
