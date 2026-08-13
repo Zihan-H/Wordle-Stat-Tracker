@@ -50,8 +50,6 @@ class WGuild():
         global raw
         data = json.loads(raw)
         currdate = dt.date(2022, 8, 12)
-        logging.info(self.calendar)
-        logging.info(list(self.calendar.keys()))
         for day in range(419, self.calendar[list(self.calendar.keys())[0]].wordlenum):
             if currdate not in self.sglobal:
                 if str(day) in data:
@@ -281,7 +279,8 @@ async def on_ready():
         wguild = WGuild(guild.id, guild.name, guild.owner)
         servers[guild.id] = wguild
         await prep_guild(guild)
-        wguild.init_sglobal()
+        if len(wguild.calendar) != 0:
+            wguild.init_sglobal()
     return
 
 @client.event
