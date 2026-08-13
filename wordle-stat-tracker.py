@@ -401,7 +401,7 @@ class HistoryView(ui.LayoutView):
             if wguild.sglobal[row[2]] != None:
                 data += "%.3f ```" % np.round(wguild.sglobal[row[2]], decimals = 3)
             else:
-                data += "N/A ```"
+                data += " N/A ```"
             box.add_item(ui.TextDisplay(data))
             box.add_item(ui.Separator())
 
@@ -640,7 +640,7 @@ async def bar(interaction: discord.Interaction, player: discord.Member, start: s
     return
 
 @tree.command(name = "crowns", description = "Number of times [player] got top score on the Wordle")
-async def crowns(interaction: discord.Interaction, player: discord.Member, secret: int | None):
+async def crowns(interaction: discord.Interaction, player: discord.Member):
     await interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     calendar = servers[interaction.guild_id].calendar
@@ -652,14 +652,12 @@ async def crowns(interaction: discord.Interaction, player: discord.Member, secre
         await interaction.followup.send(view = view)
         return
     pid = player.id
-    if secret != None:
-        pid = secret
     view = CrownLossView(server[pid].scores[list(server[pid].scores[:, 1])], f"You have won {server[pid].crowns} crowns:", '👑', servers[interaction.guild_id])
     await interaction.followup.send(view = view)
     return
 
 @tree.command(name = "fails", description = "Number of times [player] failed to solve the Wordle")
-async def fails(interaction: discord.Interaction, player: discord.Member, secret: int | None):
+async def fails(interaction: discord.Interaction, player: discord.Member):
     await interaction.response.defer(ephemeral = True, thinking = True)
     server = servers[interaction.guild_id].server
     calendar = servers[interaction.guild_id].calendar
@@ -671,8 +669,6 @@ async def fails(interaction: discord.Interaction, player: discord.Member, secret
         await interaction.followup.send(view = view)
         return
     pid = player.id
-    if secret != None:
-        pid = secret
     view = CrownLossView(server[pid].scores[server[pid].scores[:, 0] == 'X'], f"{player.display_name} has failed to solve {server[pid].losses} Wordles:", '❌', servers[interaction.guild_id])
     await interaction.followup.send(view = view)
     return
