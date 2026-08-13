@@ -2,7 +2,6 @@ import discord
 from discord import app_commands
 from discord import ui
 from discord.ext import tasks
-import re
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -47,29 +46,29 @@ class WGuild():
         self.gpar_Q3 = 0
         self.gpar_mean = 0
 
-    def init_sglobal(self):
-        global raw
-        data = json.loads(raw)
-        currdate = dt.date(2022, 8, 12)
-        for day in range(419, int(list(data.keys())[-1])):
-            if currdate not in self.sglobal:
-                if str(day) in data:
-                    wordle = data[str(day)]
-                    total = 0
-                    for score in range(1, 7):
-                        total += score * wordle['individual'][score - 1]
-                    total += self.BASE_LOSS_WEIGHT * (100 - wordle['cumulative'][-1])
-                    par = total / 100
-                    self.sglobal[currdate] = par
-                else:
-                    self.sglobal[currdate] = None
-            currdate += dt.timedelta(days = 1)
-        pardata = np.array(list(self.sglobal.values()))
-        pardata = pardata[pardata != None]
-        self.gpar_Q1 = np.quantile(pardata, 0.25)
-        self.gpar_Q2 = np.median(pardata)
-        self.gpar_Q3 = np.quantile(pardata, 0.75)
-        self.gpar_mean = np.mean(pardata)
+        def init_sglobal(self):
+            global raw
+            data = json.loads(raw)
+            currdate = dt.date(2022, 8, 12)
+            for day in range(419, self.calendar[list(self.calendar.keys())[-1]].wordlenum):
+                if currdate not in self.sglobal:
+                    if str(day) in data:
+                        wordle = data[str(day)]
+                        total = 0
+                        for score in range(1, 7):
+                            total += score * wordle['individual'][score - 1]
+                        total += self.BASE_LOSS_WEIGHT * (100 - wordle['cumulative'][-1])
+                        par = total / 100
+                        self.sglobal[currdate] = par
+                    else:
+                        self.sglobal[currdate] = None
+                currdate += dt.timedelta(days = 1)
+            pardata = np.array(list(self.sglobal.values()))
+            pardata = pardata[pardata != None]
+            self.gpar_Q1 = np.quantile(pardata, 0.25)
+            self.gpar_Q2 = np.median(pardata)
+            self.gpar_Q3 = np.quantile(pardata, 0.75)
+            self.gpar_mean = np.mean(pardata)
         
 class Player:
     def __init__(self, pid, pname):
@@ -401,7 +400,7 @@ class HistoryView(ui.LayoutView):
             if wguild.sglobal[row[2]] != None:
                 data += "%.3f ```" % np.round(wguild.sglobal[row[2]], decimals = 3)
             else:
-                data += "UNAVAILABLE"
+                data += "UNAVAILABLE ```"
             box.add_item(ui.TextDisplay(data))
             box.add_item(ui.Separator())
 
@@ -848,7 +847,7 @@ async def local_summary(interaction, date, pars_from_server):
     if par != None:
         data += "\nPar %.2f (Difficulty: %s)\n\n👑 " % (np.round(par, decimals = 2), ("Easy" if par <= par_Q1 else "Medium" if par <= par_Q3 else "Hard"))
     else:
-        data += "Global par data and difficulty are unavailable for this Wordle, try using server pars"
+        data += "\nGlobal par data and difficulty are unavailable for this Wordle, try using server pars\n"
     for row in day.leaderboard:
         row = np.append(row[np.nonzero(row)], ['0'])
         data +=  row[0] + " / 6:  " 
