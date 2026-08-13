@@ -46,29 +46,29 @@ class WGuild():
         self.gpar_Q3 = 0
         self.gpar_mean = 0
 
-        def init_sglobal(self):
-            global raw
-            data = json.loads(raw)
-            currdate = dt.date(2022, 8, 12)
-            for day in range(419, self.calendar[list(self.calendar.keys())[-1]].wordlenum):
-                if currdate not in self.sglobal:
-                    if str(day) in data:
-                        wordle = data[str(day)]
-                        total = 0
-                        for score in range(1, 7):
-                            total += score * wordle['individual'][score - 1]
-                        total += self.BASE_LOSS_WEIGHT * (100 - wordle['cumulative'][-1])
-                        par = total / 100
-                        self.sglobal[currdate] = par
-                    else:
-                        self.sglobal[currdate] = None
-                currdate += dt.timedelta(days = 1)
-            pardata = np.array(list(self.sglobal.values()))
-            pardata = pardata[pardata != None]
-            self.gpar_Q1 = np.quantile(pardata, 0.25)
-            self.gpar_Q2 = np.median(pardata)
-            self.gpar_Q3 = np.quantile(pardata, 0.75)
-            self.gpar_mean = np.mean(pardata)
+    def init_sglobal(self):
+        global raw
+        data = json.loads(raw)
+        currdate = dt.date(2022, 8, 12)
+        for day in range(419, self.calendar[list(self.calendar.keys())[-1]].wordlenum):
+            if currdate not in self.sglobal:
+                if str(day) in data:
+                    wordle = data[str(day)]
+                    total = 0
+                    for score in range(1, 7):
+                        total += score * wordle['individual'][score - 1]
+                    total += self.BASE_LOSS_WEIGHT * (100 - wordle['cumulative'][-1])
+                    par = total / 100
+                    self.sglobal[currdate] = par
+                else:
+                    self.sglobal[currdate] = None
+            currdate += dt.timedelta(days = 1)
+        pardata = np.array(list(self.sglobal.values()))
+        pardata = pardata[pardata != None]
+        self.gpar_Q1 = np.quantile(pardata, 0.25)
+        self.gpar_Q2 = np.median(pardata)
+        self.gpar_Q3 = np.quantile(pardata, 0.75)
+        self.gpar_mean = np.mean(pardata)
         
 class Player:
     def __init__(self, pid, pname):
