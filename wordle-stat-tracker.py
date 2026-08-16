@@ -314,6 +314,7 @@ async def on_message(message):
         calendar = wguild.calendar
         server = wguild.server
         date = message.created_at.date() - dt.timedelta(days = 1)
+        logging.info(date.isoformat())
         check = calendar.get(date)
         logging.info(date)
         if check == None:
@@ -345,7 +346,6 @@ async def on_message(message):
             raw = requests.get('https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js', verify = False).content[14:]
         wguild.init_sglobal()
         logging.info("global updated")
-        servers[message.guild.id] = wguild
     return
 
 class HistoryView(ui.LayoutView):
