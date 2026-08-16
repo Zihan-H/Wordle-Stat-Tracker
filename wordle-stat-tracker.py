@@ -50,6 +50,7 @@ class WGuild():
         global raw
         data = json.loads(raw)
         currdate = dt.date(2022, 8, 12)
+        logging.info(self.calendar[list(self.calendar.keys())[0]].wordlenum)
         for day in range(419, self.calendar[list(self.calendar.keys())[0]].wordlenum + 1):
             if currdate not in self.sglobal:
                 if str(day) in data:
@@ -314,9 +315,7 @@ async def on_message(message):
         calendar = wguild.calendar
         server = wguild.server
         date = message.created_at.date() - dt.timedelta(days = 1)
-        logging.info(date.isoformat())
         check = calendar.get(date)
-        logging.info(date)
         if check == None:
             rip = ripScores(message.content, date, wguild)
             scores = rip[0]
@@ -334,18 +333,24 @@ async def on_message(message):
             newboard = ripScores(message.content, date, wguild)[0]
             calendar[date].mergeLeaderboard(newboard, wguild)
         for pid in server:
-            server[pid].scores = server[pid].scores[server[pid].scores[:, 2].argsort()[::-1]]       
+            server[pid].scores = server[pid].scores[server[pid].scores[:, 2].argsort()[::
+        logging.info("messages loaded")
+        logging.info(servers[message.guild.id].calendar[date])
         pardata = np.array([calendar[day].par for day in calendar])
         wguild.par_Q1 = np.quantile(pardata, 0.25)
         wguild.par_Q2 = np.median(pardata)
         wguild.par_Q3 = np.quantile(pardata, 0.75)
         wguild.par_mean = np.mean(pardata)
-        logging.info("messages loaded")
         global raw
         if str(calendar[date].wordlenum) not in json.loads(raw):
             raw = requests.get('https://engaging-data.com/pages/scripts/wordlebot/wordlepuzzles.js', verify = False).content[14:]
         wguild.init_sglobal()
         logging.info("global updated")
+        logging.info(servers[message.guild.id].par_Q1)
+        logging.info(servers[message.guild.id].par_Q2)
+        logging.info(servers[message.guild.id].par_Q3)
+        logging.info(servers[message.guild.id].par_mean)
+        logging.info(servers[message.guild.id].sglobal[date])
     return
 
 class HistoryView(ui.LayoutView):
