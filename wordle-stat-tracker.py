@@ -333,7 +333,7 @@ async def on_message(message):
             newboard = ripScores(message.content, date, wguild)[0]
             calendar[date].mergeLeaderboard(newboard, wguild)
         for pid in server:
-            server[pid].scores = server[pid].scores[server[pid].scores[:, 2].argsort()[::
+            server[pid].scores = server[pid].scores[server[pid].scores[:, 2].argsort()[::-1]]
         logging.info("messages loaded")
         logging.info(servers[message.guild.id].calendar[date])
         pardata = np.array([calendar[day].par for day in calendar])
