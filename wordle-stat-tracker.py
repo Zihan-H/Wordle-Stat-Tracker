@@ -53,7 +53,7 @@ class WGuild():
         keys = list(self.calendar.keys())
         keys.sort()
         logging.info(self.calendar[keys[0]].wordlenum)
-        logging.info(self.calendar[keys[-1].wordlenum)
+        logging.info(self.calendar[keys[-1]].wordlenum)
         logging.info(self.calendar[list(self.calendar.keys())[0]].wordlenum)
         for day in range(419, self.calendar[list(self.calendar.keys())[0]].wordlenum + 2):
             if currdate not in self.sglobal:
